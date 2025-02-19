@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP32 Form & 3D-kub</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+    <h2>Styr ESP32 & 3D-kub</h2>
+    
+    <label>Parameter 1:</label>
+    <input type="text" id="param1"><br>
+    <label>Parameter 2:</label>
+    <input type="text" id="param2"><br>
+    <button onclick="sendData()">Skicka</button>
+
+    <div id="canvas-container" style="width: 400px; height: 400px;"></div>
+
+    <script>
+        // 📌 3D-kub med Three.js
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(400, 400);
+        document.getElementById("canvas-container").appendChild(renderer.domElement);
+
+        const geometry = new THREE.BoxGeometry();
+        const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+        const cube = new THREE.Mesh(geometry, material);
+        scene.add(cube);
+
+        camera.position.z = 5;
+
+        function animate() {
+            requestAnimationFrame(animate);
+            cube.rotation.x += 0.01;
+            cube.rotation.y += 0.01;
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // 📌 Skicka formulärdata till API-servern
+        function sendData() {
+            let param1 = document.getElementById("param1").value;
+            let param2 = document.getElementById("param2").value;
+
+            fetch('https://din-server.com/api/send', { // Ändra till din API-server
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ param1, param2 })
+            })
+            .then(response => response.text())
+            .then(data => alert("Serverns svar: " + data))
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+</html>
